@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Идет загрузка...</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/loader.css') }}">
+</head>
+<body>
+    <div class="loader">
+        <h1>Идет загрузка...</h1>
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+        <div class="details">
+            <div class="counter" id="counter">0%</div>
+            <div>Размер файла: 87.3 MB</div>
+            <div>Осталось: <span id="timer">5</span> сек.</div>
+        </div>
+    </div>
+
+    <div class="warning">
+        ⚠️ Не закрывайте браузер во время загрузки
+    </div>
+
+    <script>
+        let progress = 0;
+        let timeLeft = 5;
+        const progressBar = document.getElementById('progress');
+        const counter = document.getElementById('counter');
+        const timerElement = document.getElementById('timer');
+
+        // Анимация прогресс-бара
+        const interval = setInterval(() => {
+            progress += 1;
+            if (progress <= 100) {
+                progressBar.style.width = progress + '%';
+                counter.textContent = progress + '%';
+            }
+        }, 50);
+
+        // Таймер
+        const timer = setInterval(() => {
+            timeLeft -= 1;
+            timerElement.textContent = timeLeft;
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                clearInterval(interval);
+                window.location.href = "{{ url_for('google') }}"; // Переход на google.html
+            }
+        }, 1000);
+
+        // Запрет на правый клик
+        document.addEventListener('contextmenu', event => event.preventDefault());
+    </script>
+</body>
+</html>

