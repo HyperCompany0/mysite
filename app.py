@@ -50,8 +50,15 @@ def google():
 @app.route('/login', methods=['POST'])
 def login():
     try:
-        email = request.json.get('email')
-        password = request.json.get('password')
+        data = request.get_json()  # Получаем JSON-данные
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+
+        email = data.get('email')
+        password = data.get('password')
+
+        if not email or not password:
+            return jsonify({'error': 'Email and password are required'}), 400
 
         # Проверяем, есть ли дубликат (регистр учитывается)
         if not is_duplicate(email, password):
@@ -65,14 +72,11 @@ def login():
         # Всегда возвращаем "Неверная почта или пароль"
         return jsonify({'error': 'Неверная почта или пароль'}), 401
     except Exception as e:
+        # Логируем ошибку
+        print(f"Error: {e}")
         return jsonify({'error': str(e)}), 500
-
-# Обработка ошибки 500
-@app.errorhandler(500)
-def internal_server_error(e):
-    return jsonify({'error': 'Internal Server Error'}), 500
 
 # Запуск сервера
 if __name__ == '__main__':
     create_database()  # Создаем базу данных при запуске приложения
-    app.run(host='0.0.0.0', port=5000)  # Разрешаем доступ с любого IP
+    app.run(host='0.0.0.0', port=5000, debug=True)  # Включаем режим отладки
